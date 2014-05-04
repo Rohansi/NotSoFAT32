@@ -8,10 +8,18 @@
 Fat32::Fat32(std::shared_ptr<Fat32Disk> fat32)
     : m_fat32(fat32)
 {
-    Fat32DirectoryEntry rootEntry;
-    rootEntry.firstCluster = m_fat32->m_bpb.rootCluster;
-    rootEntry.size = std::numeric_limits<int>::max(); // hope this doesnt cause problems
+    /*std::string name = "test.txt";
 
-    Fat32File rootDir(fat32, rootEntry);
-    parse(m_fat32, rootDir);
+    Fat32DirectoryEntry entry = {};
+    std::copy(name.begin(), name.end(), entry.name);
+    entry.attrib = 0;
+    entry.size = 0;
+    entry.firstCluster = FatEof;
+
+    Fat32File file(fat32, m_fat32->m_bpb.rootCluster);
+    file.seek(0);
+    file.write((char*)&entry, sizeof(Fat32DirectoryEntry));
+    file.flush();*/
+
+    parse(m_fat32, m_fat32->m_bpb.rootCluster);
 }

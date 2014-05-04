@@ -9,12 +9,7 @@
 Fat32Directory::Fat32Directory(std::shared_ptr<Fat32Disk> fat32, int cluster)
     : m_fat32(fat32)
 {
-    Fat32DirectoryEntry entry;
-    entry.firstCluster = cluster;
-    entry.size = std::numeric_limits<int>::max(); // hope this causes no problems
-
-    Fat32File dir(fat32, entry);
-    parse(fat32, dir);
+    parse(fat32, cluster);
 }
 
 Fat32Directory::Fat32Directory(Fat32Directory &&other)

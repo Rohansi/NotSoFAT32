@@ -76,6 +76,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DirectoryEntry.cpp" />
     <ClCompile Include="Fat32Directory.cpp" />
     <ClCompile Include="Disk.cpp" />
     <ClCompile Include="Fat32.cpp" />
@@ -86,6 +87,7 @@
     <ClCompile Include="Fat32File.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DirectoryEntry.hpp" />
     <ClInclude Include="Fat32Directory.hpp" />
     <ClInclude Include="Disk.hpp" />
     <ClInclude Include="Fat32.hpp" />

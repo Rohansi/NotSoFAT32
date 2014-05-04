@@ -1,24 +1,14 @@
 #ifndef __INTERFACE_FAT32DIRECTORY_HPP
 #define __INTERFACE_FAT32DIRECTORY_HPP
 
-#include "../Fat32Common.hpp"
-
 #include <memory>
 #include <string>
 #include <unordered_map>
-#include <algorithm>
+
+#include "../Fat32Common.hpp"
+#include "../DirectoryEntry.hpp"
 
 class Fat32Disk;
-
-struct DirectoryEntry
-{
-    std::string name;
-    int attributes;
-    size_t size;
-
-    Fat32DirectoryEntry entry;
-};
-
 class Fat32Directory;
 class Fat32File;
 
@@ -36,12 +26,13 @@ public:
 
 protected:
 
-    void parse(std::shared_ptr<Fat32Disk> fat32, Fat32File &file);
+    void parse(std::shared_ptr<Fat32Disk> fat32, int firstCluster);
 
 private:
 
     std::shared_ptr<Fat32Disk> m_fat32;
     std::unordered_map<std::string, DirectoryEntry> m_entries;
+
 };
 
 #endif

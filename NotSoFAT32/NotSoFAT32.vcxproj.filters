@@ -9,6 +9,7 @@
     <ClCompile Include="Fat32AllocationTable.cpp" />
     <ClCompile Include="Fat32File.cpp" />
     <ClCompile Include="Interface\IFat32Directory.cpp" />
+    <ClCompile Include="DirectoryEntry.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disk.hpp" />
@@ -19,6 +20,7 @@
     <ClInclude Include="Fat32File.hpp" />
     <ClInclude Include="Interface\IFat32Directory.hpp" />
     <ClInclude Include="Fat32Common.hpp" />
+    <ClInclude Include="DirectoryEntry.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">
