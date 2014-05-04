@@ -1,7 +1,7 @@
 #ifndef __FAT32DIRECTORY_HPP
 #define __FAT32DIRECTORY_HPP
 
-#include "Interface\IFat32Directory.hpp"
+#include "Interface/IFat32Directory.hpp"
 #include "Fat32Common.hpp"
 
 #include <string>

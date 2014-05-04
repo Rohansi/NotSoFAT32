@@ -1,4 +1,4 @@
-#include "Interface\IFat32Directory.hpp"
+#include "Interface/IFat32Directory.hpp"
 #include "Fat32Directory.hpp"
 #include "Fat32File.hpp"
 #include "Fat32.hpp"
