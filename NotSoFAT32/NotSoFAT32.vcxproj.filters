@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Disk.cpp" />
+    <ClCompile Include="Fat32Disk.cpp" />
+    <ClCompile Include="Fat32.cpp" />
+    <ClCompile Include="Fat32Directory.cpp" />
+    <ClCompile Include="Fat32AllocationTable.cpp" />
+    <ClCompile Include="Fat32File.cpp" />
+    <ClCompile Include="Interface\IFat32Directory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Disk.hpp" />
+    <ClInclude Include="Fat32Disk.hpp" />
+    <ClInclude Include="Fat32.hpp" />
+    <ClInclude Include="Fat32Directory.hpp" />
+    <ClInclude Include="Fat32AllocationTable.hpp" />
+    <ClInclude Include="Fat32File.hpp" />
+    <ClInclude Include="Interface\IFat32Directory.hpp" />
+    <ClInclude Include="Fat32Common.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{df47d20f-2b73-4de5-a338-6a58ffbb7497}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
