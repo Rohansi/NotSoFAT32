@@ -19,6 +19,7 @@ public:
 private:
 
     std::shared_ptr<Fat32Disk> m_fat32;
+
 };
 
 bool Fat32IsValidName(const std::string &name);

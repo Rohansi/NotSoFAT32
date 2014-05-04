@@ -30,7 +30,7 @@ int Fat32Disk::getClusterCount() const
 
 void Fat32Disk::readCluster(int cluster, char *buffer)
 {
-    if (cluster >= getClusterCount())
+    if (cluster < 0 || cluster >= getClusterCount())
         throw std::exception("Cluster out of range");
 
     int clusterOffset = m_bpb.reservedSectors + m_bpb.fatSize;
@@ -39,6 +39,21 @@ void Fat32Disk::readCluster(int cluster, char *buffer)
     for (int i = 0; i < m_bpb.sectorsPerCluster; i++)
     {
         m_disk->readSector(sector++, buffer);
+        buffer += m_bpb.bytesPerSector;
+    }
+}
+
+void Fat32Disk::writeCluster(int cluster, char *buffer)
+{
+    if (cluster < 0 || cluster >= getClusterCount())
+        throw std::exception("Cluster out of range");
+
+    int clusterOffset = m_bpb.reservedSectors + m_bpb.fatSize;
+    int sector = clusterOffset + (cluster * m_bpb.sectorsPerCluster);
+
+    for (int i = 0; i < m_bpb.sectorsPerCluster; i++)
+    {
+        m_disk->writeSector(sector++, buffer);
         buffer += m_bpb.bytesPerSector;
     }
 }

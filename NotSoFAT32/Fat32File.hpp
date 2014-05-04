@@ -16,23 +16,32 @@ public:
 
     ~Fat32File();
 
-    int read(char* buffer, int count);
+    void flush();
+    void seek(int position);
+    int read(char *buffer, int count);
+    void write(char *buffer, int count);
+
     bool eof() const;
 
 private:
 
     std::shared_ptr<Fat32Disk> m_fat32;
 
-    bool m_eof;
-    int m_size;
-    int m_position;
-
-    int m_currentCluster;
-    int m_clusterOffset;
     int m_firstCluster;
     int m_clusterSize;
+    int m_size;
 
-    std::unique_ptr<char[]> m_cluster;
+    std::unique_ptr<char[]> m_buffer;
+    int m_cluster;
+    int m_clusterPosition;
+    int m_clusterOffset;
+
+    int m_position;
+    bool m_eof;
+
+    bool checkSeekToPosition(bool create = false);
+    bool checkNextCluster(bool create = false, bool read = true);
+
 };
 
 #endif
