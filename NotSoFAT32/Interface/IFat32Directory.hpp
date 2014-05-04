@@ -13,11 +13,8 @@ class Fat32Disk;
 struct DirectoryEntry
 {
     std::string name;
-    size_t size;
     int attributes;
-    time_t creationTime;
-    time_t lastAccessTime;
-    time_t lastWriteTime;
+    size_t size;
 
     Fat32DirectoryEntry entry;
 };

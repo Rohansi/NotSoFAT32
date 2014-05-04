@@ -41,8 +41,8 @@ struct Fat32DirectoryEntry
 {
     char        name[FatNameLength];    // Entry name
     char        attrib;                 // Attributes
-    int         firstCluster;           // First cluster
     int         size;                   // Entry size
+    int         firstCluster;           // First cluster
 };
 
 #pragma pack(pop)
