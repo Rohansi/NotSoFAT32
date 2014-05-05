@@ -18,8 +18,11 @@ int main(int argc, char *argv[])
 
         auto file = fat32.file("test.txt");
 
-        std::string hello = "hello world!!!";
-        file.write(hello.c_str(), hello.length());
+        std::string hello = "hello world!!\r\n";
+
+        for (int i = 0; i < 100; i++)
+            file.write(hello.c_str(), hello.length());
+
         file.seek(0);
 
         std::ofstream out("test.txt", std::ios::out | std::ios::trunc | std::ios::binary);

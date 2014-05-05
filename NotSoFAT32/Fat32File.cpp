@@ -19,7 +19,7 @@ Fat32File::Fat32File(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<Directory
     m_originalSize = m_size;
 
     m_buffer = std::make_unique<char[]>(m_clusterSize);
-    m_cluster = FatFree;
+    m_cluster = FatEof;
     m_clusterPosition = -1;
     m_clusterOffset = -1;
     m_clusterDirty = false;
@@ -198,7 +198,7 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
 
     int currentCluster = m_cluster;
 
-    if (m_firstCluster < 0 || m_firstCluster >= FatEof)
+    if (m_firstCluster < 0)
         throw std::exception("First cluster is invalid in checkNextCluster");
 
     if (m_cluster < 0)
@@ -251,6 +251,8 @@ bool Fat32File::checkHasCluster(bool alloc)
         throw std::exception("Tried to allocate on an empty entry-less file");
 
     m_firstCluster = m_fat32->m_fat.alloc();
+    m_fat32->m_fat.write(m_firstCluster, FatEof);
+
     m_entryDirty = true;
 
     return true;
