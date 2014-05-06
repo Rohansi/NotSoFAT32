@@ -59,13 +59,6 @@ Fat32File::~Fat32File()
 {
     flush();
 
-    if (m_entry && m_entryDirty)
-    {
-        m_entry->m_entry.size = m_size;
-        m_entry->m_entry.firstCluster = m_firstCluster;
-        m_entry->save();
-    }
-
     if (m_size < m_originalSize)
     {
         // TODO: free clusters that we dont need
@@ -74,11 +67,19 @@ Fat32File::~Fat32File()
 
 void Fat32File::flush()
 {
-    if (!m_clusterDirty)
-        return;
+    if (m_clusterDirty)
+    {
+        m_fat32->writeCluster(m_cluster, m_buffer.get());
+        m_clusterDirty = false;
+    }
 
-    m_fat32->writeCluster(m_cluster, m_buffer.get());
-    m_clusterDirty = false;
+    if (m_entry && m_entryDirty)
+    {
+        m_entry->m_entry.size = m_size;
+        m_entry->m_entry.firstCluster = m_firstCluster;
+        m_entry->save();
+        m_entryDirty = false;
+    }
 }
 
 void Fat32File::seek(int position)
@@ -105,7 +106,7 @@ int Fat32File::read(char *buffer, int count)
     int bytesRead = 0;
     while (bytesRead < count)
     {
-        if (m_position >= m_size || !checkNextCluster())
+        if (eof() || !checkNextCluster())
             return bytesRead;
 
         *buffer++ = m_buffer[m_clusterOffset++];
@@ -243,6 +244,7 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
     return true;
 }
 
+// allocates the first cluster if needed, to only be used by checkSeekToPosition
 // returns false if eof && !alloc
 bool Fat32File::checkHasCluster(bool alloc)
 {

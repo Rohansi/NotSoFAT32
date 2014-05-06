@@ -42,7 +42,7 @@ Fat32Directory IFat32Directory::directory(const std::string &name)
 
     int firstCluster = item->second.m_entry.firstCluster;
 
-    if ((item->second.getAttributes() & FatAttribDirectory) == 0)
+    if ((item->second.getAttributes() & FatAttrib::Directory) == 0)
         throw std::exception("Not a directory");
 
     return Fat32Directory(m_fat32, firstCluster);
@@ -56,13 +56,13 @@ Fat32File IFat32Directory::file(const std::string &name)
     if (item == m_entries.end())
         throw std::exception("Entry doesn't exist");
 
-    if ((item->second.getAttributes() & FatAttribDirectory) != 0)
+    if ((item->second.getAttributes() & FatAttrib::Directory) != 0)
         throw std::exception("Not a file");
 
     return Fat32File(m_fat32, std::make_shared<DirectoryEntry>(item->second));
 }
 
-bool IFat32Directory::add(const std::string &name, int attributes)
+bool IFat32Directory::add(const std::string &name, char attributes)
 {
     parse(); // TODO
 
@@ -105,6 +105,11 @@ bool IFat32Directory::add(const std::string &name, int attributes)
     DirectoryEntry dirEntry(m_fat32, entry, m_firstCluster, entryPosition);
     m_entries.insert(std::make_pair(dirEntry.getName(), dirEntry));
 
+    if (dirEntry.getAttributes() & FatAttrib::Directory)
+    {
+        // TODO: add . and .. entries
+    }
+
     return true;
 }
 
@@ -118,7 +123,7 @@ bool IFat32Directory::remove(const std::string &name)
 
     auto &entry = item->second;
 
-    if (entry.getAttributes() & FatAttribDirectory)
+    if (entry.getAttributes() & FatAttrib::Directory)
     {
         // need to recursively remove
         auto dir = directory(name);

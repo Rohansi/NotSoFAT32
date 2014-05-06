@@ -16,7 +16,7 @@ public:
     DirectoryEntry(const DirectoryEntry &other);
 
     const std::string& getName() const;
-    int getAttributes() const;
+    char getAttributes() const;
     size_t getSize() const;
 
 private:

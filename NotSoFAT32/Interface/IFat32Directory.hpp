@@ -25,7 +25,7 @@ public:
     Fat32Directory directory(const std::string &name);
     Fat32File file(const std::string &name);
 
-    bool add(const std::string &name, int attributes);
+    bool add(const std::string &name, char attributes);
     bool remove(const std::string &name);
     bool exists(const std::string &name);
 

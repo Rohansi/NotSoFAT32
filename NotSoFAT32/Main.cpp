@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
         const std::string hello = "hello world!!\r\n";
 
         Fat32 fat32(fat32Disk);
-        fat32.add(fileName, FatAttribFile);
+        fat32.add(fileName, FatAttrib::File);
 
         {
             auto file = fat32.file(fileName);

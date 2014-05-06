@@ -23,7 +23,7 @@ const std::string& DirectoryEntry::getName() const
     return m_name;
 }
 
-int DirectoryEntry::getAttributes() const
+char DirectoryEntry::getAttributes() const
 {
     return m_entry.attrib;
 }
