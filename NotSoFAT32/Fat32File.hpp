@@ -5,8 +5,7 @@
 #include "Fat32Common.hpp"
 #include "DirectoryEntry.hpp"
 
-class Fat32
-;
+class Fat32;
 class DirectoryEntry;
 
 class Fat32File

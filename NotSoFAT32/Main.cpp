@@ -7,14 +7,16 @@ int main(int argc, char *argv[])
 {
     try
     {
-        /*auto disk = Disk::create("disk.img", 10000);
+        auto disk = Disk::create("disk.img", 10000);
         auto fat32Disk = std::make_shared<Fat32Disk>(disk);
-        fat32Disk->format("Test Disk");*/
+        fat32Disk->format("Test Disk");
 
-        auto disk = std::make_shared<Disk>("disk.img");
-        auto fat32Disk = std::make_shared<Fat32Disk>(disk);
+        /*auto disk = std::make_shared<Disk>("disk.img");
+        auto fat32Disk = std::make_shared<Fat32Disk>(disk);*/
 
         Fat32 fat32(fat32Disk);
+
+        fat32.add("test.txt", FatAttribFile);
 
         auto file = fat32.file("test.txt");
 

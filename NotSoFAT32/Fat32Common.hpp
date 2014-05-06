@@ -8,6 +8,7 @@ const int FatBad = 0xFFFFFFFD;
 const int FatUnassign = 0xFFFFFFFE;
 const int FatFree = 0xFFFFFFFF;
 
+const int FatAttribFile = 0x00;
 const int FatAttribReadOnly = 0x01;
 const int FatAttribHidden = 0x02;
 const int FatAttribSystem = 0x04;

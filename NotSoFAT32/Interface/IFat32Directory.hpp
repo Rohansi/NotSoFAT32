@@ -17,20 +17,27 @@ class IFat32Directory
 
 public:
 
-    IFat32Directory();
+    IFat32Directory(std::shared_ptr<Fat32Disk> fat32, int firstCluster);
     IFat32Directory(IFat32Directory &&other);
 
     Fat32Directory directory(const std::string &name);
     Fat32File file(const std::string &name);
-    bool exists(const std::string &name);
+
+    bool add(const std::string &name, int attributes);
+    bool remove(const std::string &name);
+    bool exists(const std::string &name) const;
+
+    static bool isValidName(const std::string &name);
 
 protected:
 
-    void parse(std::shared_ptr<Fat32Disk> fat32, int firstCluster);
+    void parse();
 
 private:
 
     std::shared_ptr<Fat32Disk> m_fat32;
+    int m_firstCluster;
+
     std::unordered_map<std::string, DirectoryEntry> m_entries;
 
 };

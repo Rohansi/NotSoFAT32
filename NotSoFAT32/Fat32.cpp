@@ -6,20 +6,13 @@
 #include "Interface/IFat32Directory.hpp"
 
 Fat32::Fat32(std::shared_ptr<Fat32Disk> fat32)
-    : m_fat32(fat32)
+    : IFat32Directory(fat32, fat32->m_bpb.rootCluster), m_fat32(fat32)
 {
-    /*std::string name = "test.txt";
+    parse();
+}
 
-    Fat32DirectoryEntry entry = {};
-    std::copy(name.begin(), name.end(), entry.name);
-    entry.attrib = 0;
-    entry.size = 0;
-    entry.firstCluster = FatEof;
-
-    Fat32File file(fat32, m_fat32->m_bpb.rootCluster);
-    file.seek(0);
-    file.write((char*)&entry, sizeof(Fat32DirectoryEntry));
-    file.flush();*/
-
-    parse(m_fat32, m_fat32->m_bpb.rootCluster);
+Fat32::Fat32(Fat32 &&other)
+    : IFat32Directory(std::move(other))
+{
+    m_fat32 = std::move(other.m_fat32);
 }

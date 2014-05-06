@@ -13,6 +13,7 @@ class Fat32 : public IFat32Directory
 public:
 
     Fat32(std::shared_ptr<Fat32Disk> fat32);
+    Fat32(Fat32 &&other);
 
 private:
 

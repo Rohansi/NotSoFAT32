@@ -65,6 +65,11 @@ Fat32File::~Fat32File()
         m_entry->m_entry.firstCluster = m_firstCluster;
         m_entry->save();
     }
+
+    if (m_size < m_originalSize)
+    {
+        // TODO: free clusters that we dont need
+    }
 }
 
 void Fat32File::flush()
