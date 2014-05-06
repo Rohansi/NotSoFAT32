@@ -11,6 +11,7 @@ class Disk;
 class Fat32Disk
 {
     friend class Fat32AllocationTable;
+    friend class IFat32Directory;
     friend class Fat32File;
     friend class Fat32;
 

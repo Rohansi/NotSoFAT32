@@ -13,7 +13,7 @@ class DirectoryEntry
 
 public:
 
-    DirectoryEntry(DirectoryEntry &other);
+    DirectoryEntry(const DirectoryEntry &other);
 
     const std::string& getName() const;
     int getAttributes() const;

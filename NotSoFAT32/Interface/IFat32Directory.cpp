@@ -18,8 +18,24 @@ IFat32Directory::IFat32Directory(IFat32Directory &&other)
     m_entries = std::move(other.m_entries);
 }
 
+std::vector<DirectoryEntry> IFat32Directory::entries()
+{
+    parse(); // TODO
+
+    std::vector<DirectoryEntry> result;
+
+    for (auto &e : m_entries)
+    {
+        result.push_back(e.second);
+    }
+
+    return result;
+}
+
 Fat32Directory IFat32Directory::directory(const std::string &name)
 {
+    parse(); // TODO
+
     auto item = m_entries.find(name);
     if (item == m_entries.end())
         throw std::exception("Entry doesn't exist");
@@ -34,6 +50,8 @@ Fat32Directory IFat32Directory::directory(const std::string &name)
 
 Fat32File IFat32Directory::file(const std::string &name)
 {
+    parse(); // TODO
+
     auto item = m_entries.find(name);
     if (item == m_entries.end())
         throw std::exception("Entry doesn't exist");
@@ -46,6 +64,8 @@ Fat32File IFat32Directory::file(const std::string &name)
 
 bool IFat32Directory::add(const std::string &name, int attributes)
 {
+    parse(); // TODO
+
     if (!isValidName(name))
         return false;
 
@@ -90,23 +110,38 @@ bool IFat32Directory::add(const std::string &name, int attributes)
 
 bool IFat32Directory::remove(const std::string &name)
 {
+    parse(); // TODO
+
     auto item = m_entries.find(name);
     if (item == m_entries.end())
         return false;
-
-    throw std::exception("not implemented");
 
     auto &entry = item->second;
 
     if (entry.getAttributes() & FatAttribDirectory)
     {
         // need to recursively remove
+        auto dir = directory(name);
+
+        for (auto &e : dir.entries())
+        {
+            dir.remove(e.getName());
+        }
     }
     
     // need to free clusters
+    auto &fat = m_fat32->m_fat;
+    int cluster = entry.m_entry.firstCluster;
+
+    while (cluster >= 0)
+    {
+        int nextCluster = fat.read(cluster);
+        fat.free(cluster);
+        cluster = nextCluster;
+    }
 
     // mark the entry as free
-    entry.m_name[0] = 0x01;
+    entry.m_entry.name[0] = 0x01;
     entry.save();
 
     m_entries.erase(item);
@@ -114,8 +149,10 @@ bool IFat32Directory::remove(const std::string &name)
     return true;
 }
 
-bool IFat32Directory::exists(const std::string &name) const
+bool IFat32Directory::exists(const std::string &name)
 {
+    parse(); // TODO
+
     auto item = m_entries.find(name);
     return item != m_entries.end();
 }

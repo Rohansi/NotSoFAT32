@@ -20,12 +20,14 @@ public:
     IFat32Directory(std::shared_ptr<Fat32Disk> fat32, int firstCluster);
     IFat32Directory(IFat32Directory &&other);
 
+    std::vector<DirectoryEntry> entries();
+
     Fat32Directory directory(const std::string &name);
     Fat32File file(const std::string &name);
 
     bool add(const std::string &name, int attributes);
     bool remove(const std::string &name);
-    bool exists(const std::string &name) const;
+    bool exists(const std::string &name);
 
     static bool isValidName(const std::string &name);
 

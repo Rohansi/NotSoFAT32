@@ -14,30 +14,35 @@ int main(int argc, char *argv[])
         /*auto disk = std::make_shared<Disk>("disk.img");
         auto fat32Disk = std::make_shared<Fat32Disk>(disk);*/
 
+        const std::string fileName = "test.txt";
+        const std::string hello = "hello world!!\r\n";
+
         Fat32 fat32(fat32Disk);
+        fat32.add(fileName, FatAttribFile);
 
-        fat32.add("test.txt", FatAttribFile);
-
-        auto file = fat32.file("test.txt");
-
-        std::string hello = "hello world!!\r\n";
-
-        for (int i = 0; i < 100; i++)
-            file.write(hello.c_str(), hello.length());
-
-        file.seek(0);
-
-        std::ofstream out("test.txt", std::ios::out | std::ios::trunc | std::ios::binary);
-
-        char buffer[512];
-        int bytesRead = 0;
-
-        while (bytesRead = file.read(buffer, 512))
         {
-            out.write(buffer, bytesRead);
+            auto file = fat32.file(fileName);
+
+            for (int i = 0; i < 100; i++)
+                file.write(hello.c_str(), hello.length());
+
+            file.seek(0);
+
+            std::ofstream out(fileName, std::ios::out | std::ios::trunc | std::ios::binary);
+
+            char buffer[512];
+            int bytesRead = 0;
+
+            while (bytesRead = file.read(buffer, 512))
+            {
+                out.write(buffer, bytesRead);
+            }
+
+            out.close();
         }
 
-        out.close();
+        std::cout << "done!";
+        fat32.remove("test.txt");
     }
     catch (std::exception &e)
     {

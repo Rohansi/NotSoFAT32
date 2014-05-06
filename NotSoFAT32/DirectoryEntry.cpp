@@ -9,7 +9,7 @@ DirectoryEntry::DirectoryEntry(std::shared_ptr<Fat32Disk> fat32, Fat32DirectoryE
     m_name = std::string(m_entry.name, strnlen(m_entry.name, FatNameLength));
 }
 
-DirectoryEntry::DirectoryEntry(DirectoryEntry &other)
+DirectoryEntry::DirectoryEntry(const DirectoryEntry &other)
 {
     m_fat32 = other.m_fat32;
     m_entry = other.m_entry;
