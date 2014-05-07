@@ -3,26 +3,61 @@
 #include "../Fat32Common.hpp"
 #include "../Fat32Directory.hpp"
 #include "../Fat32File.hpp"
+#include "../Fat32Disk.hpp"
 
-IFat32Directory::IFat32Directory(std::shared_ptr<Fat32Disk> fat32, int firstCluster)
+IFat32Directory::IFat32Directory(std::shared_ptr<Fat32Disk> fat32)
 {
     m_fat32 = fat32;
-    m_firstCluster = firstCluster;
+    m_entry = std::shared_ptr<DirectoryEntry>();
 }
 
 IFat32Directory::IFat32Directory(IFat32Directory &&other)
 {
     m_fat32 = std::move(other.m_fat32);
-    m_firstCluster = other.m_firstCluster;
+    m_entry = std::move(other.m_entry);
 
     m_entries = std::move(other.m_entries);
 }
 
-std::vector<DirectoryEntry> IFat32Directory::entries()
+void IFat32Directory::checkInitialized()
 {
-    parse(); // TODO
+    if (!m_entry)
+        initialize();
+}
 
-    std::vector<DirectoryEntry> result;
+void IFat32Directory::initialize()
+{
+    if (!m_entry)
+        throw std::exception("directory did not set entry");
+
+    m_entries.clear();
+
+    Fat32File file(m_fat32, m_entry);
+    Fat32DirectoryEntry entry;
+
+    while (true)
+    {
+        int entryPosition = file.tell();
+
+        if (file.read((char*)&entry, sizeof(Fat32DirectoryEntry)) != sizeof(Fat32DirectoryEntry))
+            break;
+
+        if (entry.name[0] == 0x00) // stop
+            break;
+
+        if (entry.name[0] == (char)0x01) // free
+            continue;
+
+        auto dirEntry = std::shared_ptr<DirectoryEntry>(new DirectoryEntry(m_fat32, shared_from_this(), entryPosition, entry));
+        m_entries.insert(std::make_pair(dirEntry->getName(), dirEntry));
+    }
+}
+
+std::vector<std::shared_ptr<DirectoryEntry>> IFat32Directory::entries()
+{
+    checkInitialized();
+
+    std::vector<std::shared_ptr<DirectoryEntry>> result;
 
     for (auto &e : m_entries)
     {
@@ -32,39 +67,39 @@ std::vector<DirectoryEntry> IFat32Directory::entries()
     return result;
 }
 
-Fat32Directory IFat32Directory::directory(const std::string &name)
+std::shared_ptr<IFat32Directory> IFat32Directory::directory(const std::string &name)
 {
-    parse(); // TODO
+    checkInitialized();
 
     auto item = m_entries.find(name);
     if (item == m_entries.end())
         throw std::exception("Entry doesn't exist");
 
-    int firstCluster = item->second.m_entry.firstCluster;
-
-    if ((item->second.getAttributes() & FatAttrib::Directory) == 0)
+    if ((item->second->getAttributes() & FatAttrib::Directory) == 0)
         throw std::exception("Not a directory");
 
-    return Fat32Directory(m_fat32, firstCluster);
+    int firstCluster = item->second->m_entry.firstCluster;
+
+    return m_fat32->getOrAddDirectory(firstCluster, [&]() { return Fat32Directory(m_fat32, item->second); });
 }
 
 Fat32File IFat32Directory::file(const std::string &name)
 {
-    parse(); // TODO
+    checkInitialized();
 
     auto item = m_entries.find(name);
     if (item == m_entries.end())
         throw std::exception("Entry doesn't exist");
 
-    if ((item->second.getAttributes() & FatAttrib::Directory) != 0)
+    if ((item->second->getAttributes() & FatAttrib::Directory) != 0)
         throw std::exception("Not a file");
 
-    return Fat32File(m_fat32, std::make_shared<DirectoryEntry>(item->second));
+    return Fat32File(m_fat32, item->second);
 }
 
 bool IFat32Directory::add(const std::string &name, char attributes)
 {
-    parse(); // TODO
+    checkInitialized();
 
     if (!isValidName(name))
         return false;
@@ -72,7 +107,7 @@ bool IFat32Directory::add(const std::string &name, char attributes)
     if (exists(name))
         return false;
 
-    Fat32File file(m_fat32, m_firstCluster);
+    Fat32File file(m_fat32, m_entry);
     Fat32DirectoryEntry entry;
     int entryPosition;
 
@@ -102,10 +137,10 @@ bool IFat32Directory::add(const std::string &name, char attributes)
     file.write((char*)&entry, sizeof(Fat32DirectoryEntry));
 
     // add to entry list
-    DirectoryEntry dirEntry(m_fat32, entry, m_firstCluster, entryPosition);
-    m_entries.insert(std::make_pair(dirEntry.getName(), dirEntry));
+    auto dirEntry = std::shared_ptr<DirectoryEntry>(new DirectoryEntry(m_fat32, shared_from_this(), entryPosition, entry));
+    m_entries.insert(std::make_pair(dirEntry->getName(), dirEntry));
 
-    if (dirEntry.getAttributes() & FatAttrib::Directory)
+    if (dirEntry->getAttributes() & FatAttrib::Directory)
     {
         // TODO: add . and .. entries
     }
@@ -115,7 +150,7 @@ bool IFat32Directory::add(const std::string &name, char attributes)
 
 bool IFat32Directory::remove(const std::string &name)
 {
-    parse(); // TODO
+    checkInitialized();
 
     auto item = m_entries.find(name);
     if (item == m_entries.end())
@@ -123,20 +158,20 @@ bool IFat32Directory::remove(const std::string &name)
 
     auto &entry = item->second;
 
-    if (entry.getAttributes() & FatAttrib::Directory)
+    if (entry->getAttributes() & FatAttrib::Directory)
     {
         // need to recursively remove
         auto dir = directory(name);
 
-        for (auto &e : dir.entries())
+        for (auto &e : dir->entries())
         {
-            dir.remove(e.getName());
+            dir->remove(e->getName());
         }
     }
     
     // need to free clusters
     auto &fat = m_fat32->m_fat;
-    int cluster = entry.m_entry.firstCluster;
+    int cluster = entry->m_entry.firstCluster;
 
     while (cluster >= 0)
     {
@@ -146,8 +181,8 @@ bool IFat32Directory::remove(const std::string &name)
     }
 
     // mark the entry as free
-    entry.m_entry.name[0] = 0x01;
-    entry.save();
+    entry->m_entry.name[0] = 0x01;
+    entry->save();
 
     m_entries.erase(item);
 
@@ -156,35 +191,18 @@ bool IFat32Directory::remove(const std::string &name)
 
 bool IFat32Directory::exists(const std::string &name)
 {
-    parse(); // TODO
+    checkInitialized();
 
     auto item = m_entries.find(name);
     return item != m_entries.end();
 }
 
-void IFat32Directory::parse()
+void IFat32Directory::update(const DirectoryEntry &entry)
 {
-    m_entries.clear();
-
-    Fat32File file(m_fat32, m_firstCluster);
-    Fat32DirectoryEntry entry;
-
-    while (true)
-    {
-        int entryPosition = file.tell();
-
-        if (file.read((char*)&entry, sizeof(Fat32DirectoryEntry)) != sizeof(Fat32DirectoryEntry))
-            break;
-
-        if (entry.name[0] == 0x00) // stop
-            break;
-
-        if (entry.name[0] == (char)0x01) // free
-            continue;
-
-        DirectoryEntry dirEntry(m_fat32, entry, m_firstCluster, entryPosition);
-        m_entries.insert(std::make_pair(dirEntry.getName(), dirEntry));
-    }
+    // TODO: defer this to dtor
+    Fat32File file(m_fat32, m_entry);
+    file.seek(entry.m_parentPosition);
+    file.write((char*)&entry.m_entry, sizeof(Fat32DirectoryEntry));
 }
 
 static const std::string illegalChars =

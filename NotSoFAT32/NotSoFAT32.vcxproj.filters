@@ -4,23 +4,23 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Disk.cpp" />
     <ClCompile Include="Fat32Disk.cpp" />
-    <ClCompile Include="Fat32.cpp" />
     <ClCompile Include="Fat32Directory.cpp" />
     <ClCompile Include="Fat32AllocationTable.cpp" />
     <ClCompile Include="Fat32File.cpp" />
     <ClCompile Include="Interface\IFat32Directory.cpp" />
     <ClCompile Include="DirectoryEntry.cpp" />
+    <ClCompile Include="Fat32Root.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disk.hpp" />
     <ClInclude Include="Fat32Disk.hpp" />
-    <ClInclude Include="Fat32.hpp" />
     <ClInclude Include="Fat32Directory.hpp" />
     <ClInclude Include="Fat32AllocationTable.hpp" />
     <ClInclude Include="Fat32File.hpp" />
     <ClInclude Include="Interface\IFat32Directory.hpp" />
     <ClInclude Include="Fat32Common.hpp" />
     <ClInclude Include="DirectoryEntry.hpp" />
+    <ClInclude Include="Fat32Root.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Utility">

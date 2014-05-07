@@ -3,17 +3,17 @@
 
 #include <string>
 #include "Fat32Common.hpp"
-#include "Fat32Disk.hpp"
 #include "Fat32File.hpp"
+
+class Fat32Disk;
 
 class DirectoryEntry
 {
+    friend class Fat32Root;
     friend class IFat32Directory;
     friend class Fat32File;
 
 public:
-
-    DirectoryEntry(const DirectoryEntry &other);
 
     const std::string& getName() const;
     char getAttributes() const;
@@ -21,14 +21,14 @@ public:
 
 private:
 
-    DirectoryEntry(std::shared_ptr<Fat32Disk> fat32, Fat32DirectoryEntry entry, int parentFirstCluster, int parentPosition);
+    DirectoryEntry(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<IFat32Directory> parent, int parentPosition, Fat32DirectoryEntry entry);
 
     void save() const;
 
     std::shared_ptr<Fat32Disk> m_fat32;
-    Fat32DirectoryEntry m_entry;
-    int m_parentFirstCluster;
+    std::shared_ptr<IFat32Directory> m_parent;
     int m_parentPosition;
+    Fat32DirectoryEntry m_entry;
     std::string m_name;
 
 };

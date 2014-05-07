@@ -7,17 +7,24 @@
 #include "Fat32Disk.hpp"
 #include "Interface/IFat32Directory.hpp"
 
-class Fat32 : public IFat32Directory
+class Fat32Root : public IFat32Directory
 {
 
 public:
 
-    Fat32(std::shared_ptr<Fat32Disk> fat32);
-    Fat32(Fat32 &&other);
+    Fat32Root(std::shared_ptr<Fat32Disk> fat32);
+    Fat32Root(Fat32Root &&other);
+
+protected:
+
+    virtual void initialize();
 
 private:
 
     std::shared_ptr<Fat32Disk> m_fat32;
+
+    std::shared_ptr<DirectoryEntry> getRootEntry(std::shared_ptr<Fat32Disk> fat32);
+
 };
 
 #endif

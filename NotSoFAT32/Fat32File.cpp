@@ -27,13 +27,6 @@ Fat32File::Fat32File(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<Directory
     m_position = 0;
 }
 
-Fat32File::Fat32File(std::shared_ptr<Fat32Disk> fat32, int firstCluster)
-    : Fat32File(fat32, std::shared_ptr<DirectoryEntry>())
-{
-    m_firstCluster = firstCluster;
-    m_size = std::numeric_limits<int>::max();
-}
-
 Fat32File::Fat32File(Fat32File &&other)
 {
     m_fat32 = std::move(other.m_fat32);

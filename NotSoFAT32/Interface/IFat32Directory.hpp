@@ -12,17 +12,18 @@ class Fat32Disk;
 class Fat32Directory;
 class Fat32File;
 
-class IFat32Directory
+class IFat32Directory : public std::enable_shared_from_this<IFat32Directory>
 {
+    friend class DirectoryEntry;
 
 public:
 
-    IFat32Directory(std::shared_ptr<Fat32Disk> fat32, int firstCluster);
+    IFat32Directory(std::shared_ptr<Fat32Disk> fat32);
     IFat32Directory(IFat32Directory &&other);
 
-    std::vector<DirectoryEntry> entries();
+    std::vector<std::shared_ptr<DirectoryEntry>> entries();
 
-    Fat32Directory directory(const std::string &name);
+    std::shared_ptr<IFat32Directory> directory(const std::string &name);
     Fat32File file(const std::string &name);
 
     bool add(const std::string &name, char attributes);
@@ -33,14 +34,17 @@ public:
 
 protected:
 
-    void parse();
+    std::shared_ptr<DirectoryEntry> m_entry;
+
+    virtual void initialize();
 
 private:
 
     std::shared_ptr<Fat32Disk> m_fat32;
-    int m_firstCluster;
+    std::unordered_map<std::string, std::shared_ptr<DirectoryEntry>> m_entries;
 
-    std::unordered_map<std::string, DirectoryEntry> m_entries;
+    void checkInitialized();
+    void update(const DirectoryEntry &entry);
 
 };
 

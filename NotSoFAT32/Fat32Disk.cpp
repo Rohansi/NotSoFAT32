@@ -58,6 +58,16 @@ void Fat32Disk::writeCluster(int cluster, char *buffer)
     }
 }
 
+std::shared_ptr<Fat32Root> Fat32Disk::root()
+{
+    if (!m_root)
+    {
+        m_root = std::make_shared<Fat32Root>(shared_from_this());
+    }
+
+    return m_root;
+}
+
 void Fat32Disk::format(const std::string &volumeLabel, int sectorsPerCluster)
 {
     if (volumeLabel.length() > 16)
@@ -104,4 +114,30 @@ void Fat32Disk::format(const std::string &volumeLabel, int sectorsPerCluster)
         if (i == 0)
             fatBuffer[0] = FatFree;
     }
+}
+
+std::shared_ptr<IFat32Directory> Fat32Disk::getOrAddDirectory(int firstCluster, std::function<IFat32Directory()> ctor)
+{
+    auto item = m_directories.find(firstCluster);
+    std::shared_ptr<IFat32Directory> result;
+
+    if (item == m_directories.end())
+    {
+        result = std::make_shared<IFat32Directory>(ctor());
+        m_directories.insert(std::make_pair(firstCluster, result));
+    }
+    else
+    {
+        if (result = item->second.lock())
+        {
+            return result;
+        }
+        else
+        {
+            result = std::make_shared<IFat32Directory>(ctor());
+            item->second = result;
+        }
+    }
+
+    return result;
 }

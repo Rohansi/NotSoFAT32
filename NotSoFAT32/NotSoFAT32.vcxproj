@@ -79,7 +79,7 @@
     <ClCompile Include="DirectoryEntry.cpp" />
     <ClCompile Include="Fat32Directory.cpp" />
     <ClCompile Include="Disk.cpp" />
-    <ClCompile Include="Fat32.cpp" />
+    <ClCompile Include="Fat32Root.cpp" />
     <ClCompile Include="Fat32Disk.cpp" />
     <ClCompile Include="Fat32AllocationTable.cpp" />
     <ClCompile Include="Interface\IFat32Directory.cpp" />
@@ -90,7 +90,7 @@
     <ClInclude Include="DirectoryEntry.hpp" />
     <ClInclude Include="Fat32Directory.hpp" />
     <ClInclude Include="Disk.hpp" />
-    <ClInclude Include="Fat32.hpp" />
+    <ClInclude Include="Fat32Root.hpp" />
     <ClInclude Include="Fat32Disk.hpp" />
     <ClInclude Include="Fat32Common.hpp" />
     <ClInclude Include="Fat32AllocationTable.hpp" />

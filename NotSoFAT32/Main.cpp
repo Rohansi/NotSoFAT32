@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "Fat32.hpp"
+#include "Fat32Disk.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -17,11 +17,11 @@ int main(int argc, char *argv[])
         const std::string fileName = "test.txt";
         const std::string hello = "hello world!!\r\n";
 
-        Fat32 fat32(fat32Disk);
-        fat32.add(fileName, FatAttrib::File);
+        auto root = fat32Disk->root();
+        root->add(fileName, FatAttrib::File);
 
         {
-            auto file = fat32.file(fileName);
+            auto file = root->file(fileName);
 
             for (int i = 0; i < 100; i++)
                 file.write(hello.c_str(), hello.length());
@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
         }
 
         std::cout << "done!";
-        fat32.remove("test.txt");
+        root->remove("test.txt");
     }
     catch (std::exception &e)
     {

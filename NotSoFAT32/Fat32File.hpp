@@ -6,6 +6,7 @@
 #include "DirectoryEntry.hpp"
 
 class Fat32;
+class Fat32Disk;
 class DirectoryEntry;
 
 class Fat32File
@@ -14,9 +15,7 @@ class Fat32File
 public:
 
     Fat32File(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<DirectoryEntry> entry); // internal
-    Fat32File(std::shared_ptr<Fat32Disk> fat32, int firstCluster); // internal
     Fat32File(Fat32File &&other);
-
     ~Fat32File();
 
     void flush();
