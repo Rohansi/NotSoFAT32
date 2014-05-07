@@ -19,11 +19,11 @@ public:
     ~Fat32File();
 
     void flush();
-    void seek(int position);
-    int tell() const;
+    void seek(size_t position);
+    size_t tell() const;
 
-    int read(char *buffer, int count);
-    void write(const char *buffer, int count);
+    size_t read(char *buffer, size_t count);
+    void write(const char *buffer, size_t count);
 
     bool eof() const;
 
@@ -34,18 +34,18 @@ private:
     std::shared_ptr<DirectoryEntry> m_entry;
     bool m_entryDirty;
 
-    int m_firstCluster;
-    int m_clusterSize;
-    int m_originalSize;
-    int m_size;
+    size_t m_firstCluster;
+    size_t m_clusterSize;
+    size_t m_originalSize;
+    size_t m_size;
 
     std::unique_ptr<char[]> m_buffer;
-    int m_cluster;
-    int m_clusterPosition;
-    int m_clusterOffset;
+    size_t m_cluster;
+    size_t m_clusterPosition;
+    size_t m_clusterOffset;
     bool m_clusterDirty;
 
-    int m_position;
+    size_t m_position;
 
     bool checkSeekToPosition(bool alloc = false);
     bool checkNextCluster(bool alloc = false, bool read = true);

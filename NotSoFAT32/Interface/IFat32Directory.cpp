@@ -173,7 +173,7 @@ bool IFat32Directory::remove(const std::string &name)
     auto &fat = m_fat32->m_fat;
     int cluster = entry->m_entry.firstCluster;
 
-    while (cluster >= 0)
+    while (cluster < FatEof)
     {
         int nextCluster = fat.read(cluster);
         fat.free(cluster);

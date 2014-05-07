@@ -1,6 +1,6 @@
 #include "Disk.hpp"
 
-Disk::Disk(const std::string &filename, int sectorSize)
+Disk::Disk(const std::string &filename, size_t sectorSize)
     : m_file(filename, std::fstream::in | std::fstream::out | std::fstream::binary)
 {
     if (!m_file.is_open())
@@ -18,24 +18,24 @@ Disk::Disk(const std::string &filename, int sectorSize)
     m_sectorSize = sectorSize;
 }
 
-Disk::Disk(std::fstream &file, int sectorCount, int sectorSize)
+Disk::Disk(std::fstream &file, size_t sectorCount, size_t sectorSize)
     : m_file(std::move(file))
 {
     m_sectorCount = sectorCount;
     m_sectorSize = sectorSize;
 }
 
-int Disk::getSectorSize() const
+size_t Disk::getSectorSize() const
 {
     return m_sectorSize;
 }
 
-int Disk::getSectorCount() const
+size_t Disk::getSectorCount() const
 {
     return m_sectorCount;
 }
 
-void Disk::readSector(int sector, void *buffer)
+void Disk::readSector(size_t sector, void *buffer)
 {
     if (sector < 0 || sector >= m_sectorCount)
         throw std::exception("Sector doesn't exist");
@@ -48,7 +48,7 @@ void Disk::readSector(int sector, void *buffer)
         throw std::exception("Failed to read sector");
 }
 
-void Disk::writeSector(int sector, void *buffer)
+void Disk::writeSector(size_t sector, void *buffer)
 {
     if (sector < 0 || sector >= m_sectorCount)
         throw std::exception("Sector doesn't exist");
@@ -61,7 +61,7 @@ void Disk::writeSector(int sector, void *buffer)
         throw std::exception("Failed to write sector");
 }
 
-std::shared_ptr<Disk> Disk::create(const std::string &filename, int sectorCount, int sectorSize)
+std::shared_ptr<Disk> Disk::create(const std::string &filename, size_t sectorCount, size_t sectorSize)
 {
     if (sectorCount < 100)
         throw std::exception("Invalid sector count");

@@ -75,7 +75,7 @@ void Fat32File::flush()
     }
 }
 
-void Fat32File::seek(int position)
+void Fat32File::seek(size_t position)
 {
     if (position < 0)
         throw std::exception("Seek to negative");
@@ -83,12 +83,12 @@ void Fat32File::seek(int position)
     m_position = position;
 }
 
-int Fat32File::tell() const
+size_t Fat32File::tell() const
 {
     return m_position;
 }
 
-int Fat32File::read(char *buffer, int count)
+size_t Fat32File::read(char *buffer, size_t count)
 {
     if (eof())
         return 0;
@@ -96,7 +96,7 @@ int Fat32File::read(char *buffer, int count)
     if (!checkSeekToPosition())
         return 0;
 
-    int bytesRead = 0;
+    size_t bytesRead = 0;
     while (bytesRead < count)
     {
         if (eof() || !checkNextCluster())
@@ -110,11 +110,11 @@ int Fat32File::read(char *buffer, int count)
     return bytesRead;
 }
 
-void Fat32File::write(const char *buffer, int count)
+void Fat32File::write(const char *buffer, size_t count)
 {
     checkSeekToPosition(true);
 
-    int bytesWritten = 0;
+    size_t bytesWritten = 0;
     while (bytesWritten < count)
     {
         checkNextCluster(true);
@@ -141,14 +141,14 @@ bool Fat32File::eof() const
 // returns false if eof && !alloc
 bool Fat32File::checkSeekToPosition(bool alloc)
 {
-    int clusterPositionOffset = m_clusterPosition + m_clusterOffset;
+    auto clusterPositionOffset = m_clusterPosition + m_clusterOffset;
     if (m_position == clusterPositionOffset)
         return true;
 
     flush();
 
-    int positionIndex = m_position / m_clusterSize;
-    int clusterIndex = clusterPositionOffset / m_clusterSize;
+    auto positionIndex = m_position / m_clusterSize;
+    auto clusterIndex = clusterPositionOffset / m_clusterSize;
 
     if (m_position >= 0 && m_position < m_clusterSize) // moved to first cluster
     {
@@ -170,7 +170,7 @@ bool Fat32File::checkSeekToPosition(bool alloc)
             m_clusterPosition = 0;
         }
 
-        int targetClusterPosition = positionIndex * m_clusterSize;
+        auto targetClusterPosition = positionIndex * m_clusterSize;
 
         while (m_clusterPosition != targetClusterPosition)
         {
@@ -195,12 +195,12 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
 
     flush();
 
-    int currentCluster = m_cluster;
+    auto currentCluster = m_cluster;
 
-    if (m_firstCluster < 0)
+    if (m_firstCluster >= FatEof)
         throw std::exception("First cluster is invalid in checkNextCluster");
 
-    if (m_cluster < 0)
+    if (m_cluster >= FatEof)
         m_cluster = m_firstCluster;
     else
         m_cluster = m_fat32->m_fat.read(m_cluster);
@@ -220,8 +220,7 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
             return false;
             
         auto &fat = m_fat32->m_fat;
-
-        int nextCluster = fat.alloc();
+        auto nextCluster = fat.alloc();
         fat.write(currentCluster, nextCluster);
         fat.write(nextCluster, FatEof);
 

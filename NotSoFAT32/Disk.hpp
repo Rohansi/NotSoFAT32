@@ -7,31 +7,31 @@
 #include <memory>
 #include <limits>
 
-const int MinBytesPerSector = 512;
-const int MaxBytesPerSector = 4096;
+const size_t MinBytesPerSector = 512;
+const size_t MaxBytesPerSector = 4096;
 
 class Disk
 {
 
 public:
 
-    Disk(const std::string &filename, int sectorSize = MinBytesPerSector);
-    Disk(std::fstream &file, int sectorCount, int sectorSize);
+    Disk(const std::string &filename, size_t sectorSize = MinBytesPerSector);
+    Disk(std::fstream &file, size_t sectorCount, size_t sectorSize);
 
-    void writeSector(int sector, void *buffer);
-    void readSector(int sector, void *buffer);
+    void writeSector(size_t sector, void *buffer);
+    void readSector(size_t sector, void *buffer);
 
-    int getSectorCount() const;
-    int getSectorSize() const;
+    size_t getSectorCount() const;
+    size_t getSectorSize() const;
 
-    static std::shared_ptr<Disk> create(const std::string &filename, int sectorCount, int sectorSize = MinBytesPerSector);
+    static std::shared_ptr<Disk> create(const std::string &filename, size_t sectorCount, size_t sectorSize = MinBytesPerSector);
 
 private:
 
     std::fstream m_file;
 
-    int m_sectorCount;
-    int m_sectorSize;
+    size_t m_sectorCount;
+    size_t m_sectorSize;
 };
 
 #endif

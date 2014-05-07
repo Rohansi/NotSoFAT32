@@ -27,14 +27,14 @@ public:
 
     std::shared_ptr<Disk> getDisk() const;
 
-    int getClusterSize() const;
-    int getClusterCount() const;
-    void readCluster(int cluster, char *buffer);
-    void writeCluster(int cluster, char *buffer);
+    size_t getClusterSize() const;
+    size_t getClusterCount() const;
+    void readCluster(fatcluster_t cluster, char *buffer);
+    void writeCluster(fatcluster_t cluster, char *buffer);
 
     std::shared_ptr<Fat32Root> root();
 
-    void format(const std::string &volumeLabel, int sectorsPerCluster = 1);
+    void format(const std::string &volumeLabel, size_t sectorsPerCluster = 1);
 
 private:
 
@@ -43,8 +43,8 @@ private:
     Fat32AllocationTable m_fat;
     std::shared_ptr<Fat32Root> m_root;
 
-    std::unordered_map<int, std::weak_ptr<IFat32Directory>> m_directories;
-    std::shared_ptr<IFat32Directory> getOrAddDirectory(int firstCluster, std::function<IFat32Directory()> ctor);
+    std::unordered_map<size_t, std::weak_ptr<IFat32Directory>> m_directories;
+    std::shared_ptr<IFat32Directory> getOrAddDirectory(size_t firstCluster, std::function<IFat32Directory()> ctor);
 
 };
 
