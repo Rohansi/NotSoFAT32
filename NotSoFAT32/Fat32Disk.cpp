@@ -81,6 +81,11 @@ void Fat32Disk::format(const std::string &volumeLabel, size_t sectorsPerCluster)
     m_fat.reset();
     m_bpb = {};
 
+    const std::string nsfat32 = "NSFAT32";
+
+    std::copy(nsfat32.begin(), nsfat32.end(), m_bpb.fsysName);
+    m_bpb.fsysVersion = 0;
+
     m_bpb.bytesPerSector = m_disk->getSectorSize();
     m_bpb.totalSectors = m_disk->getSectorCount();
     m_bpb.reservedSectors = 1; // the bpb
@@ -88,7 +93,7 @@ void Fat32Disk::format(const std::string &volumeLabel, size_t sectorsPerCluster)
     m_bpb.sectorsPerCluster = sectorsPerCluster;
 
     auto totalClusters = m_bpb.totalSectors / m_bpb.sectorsPerCluster;
-    m_bpb.fatSize = (totalClusters * sizeof(int)) / m_bpb.bytesPerSector; // TODO: fatSize is too large with this method as it includes the fat in the calculation
+    m_bpb.fatSize = (totalClusters * sizeof(fatcluster_t)) / m_bpb.bytesPerSector; // TODO: fatSize is too large with this method as it includes the fat in the calculation
 
     m_bpb.rootCluster = 0;
 
