@@ -23,6 +23,7 @@ public:
 
     std::vector<std::shared_ptr<DirectoryEntry>> entries();
 
+    std::shared_ptr<IFat32Directory> up();
     std::shared_ptr<IFat32Directory> directory(const std::string &name);
     Fat32File file(const std::string &name);
 

@@ -67,6 +67,12 @@ std::vector<std::shared_ptr<DirectoryEntry>> IFat32Directory::entries()
     return result;
 }
 
+std::shared_ptr<IFat32Directory> IFat32Directory::up()
+{
+    checkInitialized();
+    return m_entry->m_parent;
+}
+
 std::shared_ptr<IFat32Directory> IFat32Directory::directory(const std::string &name)
 {
     checkInitialized();
@@ -139,11 +145,6 @@ bool IFat32Directory::add(const std::string &name, char attributes)
     // add to entry list
     auto dirEntry = std::shared_ptr<DirectoryEntry>(new DirectoryEntry(m_fat32, shared_from_this(), entryPosition, entry));
     m_entries.insert(std::make_pair(dirEntry->getName(), dirEntry));
-
-    if (dirEntry->getAttributes() & FatAttrib::Directory)
-    {
-        // TODO: add . and .. entries
-    }
 
     return true;
 }
