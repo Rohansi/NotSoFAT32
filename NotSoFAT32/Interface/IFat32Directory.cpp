@@ -135,7 +135,7 @@ bool IFat32Directory::add(const std::string &name, char attributes)
     // write new entry
     entry = {};
     std::copy(name.begin(), name.end(), entry.name);
-    entry.attrib = 0;
+    entry.attrib = attributes;
     entry.size = 0;
     entry.firstCluster = FatEof;
 

@@ -17,11 +17,12 @@ int main(int argc, char *argv[])
         const std::string fileName = "test.txt";
         const std::string hello = "hello world!!\r\n";
 
-        auto root = fat32Disk->root();
-        root->add(fileName, FatAttrib::File);
+        auto dir = fat32Disk->root();
+        dir->add(fileName, FatAttrib::File);
+        dir->add("testfolder", FatAttrib::Directory);
 
         {
-            auto file = root->file(fileName);
+            auto file = dir->file(fileName);
 
             for (int i = 0; i < 100; i++)
                 file.write(hello.c_str(), hello.length());
@@ -41,8 +42,17 @@ int main(int argc, char *argv[])
             out.close();
         }
 
-        std::cout << "done!";
-        root->remove("test.txt");
+        auto entries = dir->entries();
+
+        for (auto e : entries)
+        {
+            std::cout << e->getName();
+
+            if (!(e->getAttributes() & FatAttrib::Directory))
+                std::cout << " - " << e->getSize() << " bytes";
+
+            std::cout << std::endl;
+        }
     }
     catch (std::exception &e)
     {
