@@ -27,6 +27,8 @@ public:
 
     bool eof() const;
 
+    void truncate();
+
 private:
 
     std::shared_ptr<Fat32Disk> m_fat32;

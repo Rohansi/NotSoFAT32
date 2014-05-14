@@ -137,6 +137,13 @@ bool Fat32File::eof() const
     return m_position >= m_size;
 }
 
+void Fat32File::truncate()
+{
+    flush();
+    m_size = 0;
+    seek(0);
+}
+
 // switches to the cluster at m_position if needed
 // returns false if eof && !alloc
 bool Fat32File::checkSeekToPosition(bool alloc)
