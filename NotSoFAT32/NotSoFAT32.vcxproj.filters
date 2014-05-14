@@ -7,9 +7,11 @@
     <ClCompile Include="Fat32Directory.cpp" />
     <ClCompile Include="Fat32AllocationTable.cpp" />
     <ClCompile Include="Fat32File.cpp" />
-    <ClCompile Include="Interface\IFat32Directory.cpp" />
     <ClCompile Include="DirectoryEntry.cpp" />
     <ClCompile Include="Fat32Root.cpp" />
+    <ClCompile Include="Interface\IFat32Directory.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Disk.hpp" />
@@ -17,14 +19,16 @@
     <ClInclude Include="Fat32Directory.hpp" />
     <ClInclude Include="Fat32AllocationTable.hpp" />
     <ClInclude Include="Fat32File.hpp" />
-    <ClInclude Include="Interface\IFat32Directory.hpp" />
     <ClInclude Include="Fat32Common.hpp" />
     <ClInclude Include="DirectoryEntry.hpp" />
     <ClInclude Include="Fat32Root.hpp" />
+    <ClInclude Include="Interface\IFat32Directory.hpp">
+      <Filter>Interface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Utility">
-      <UniqueIdentifier>{df47d20f-2b73-4de5-a338-6a58ffbb7497}</UniqueIdentifier>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{cf24e0e7-4e01-4404-887f-024682db59c8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
