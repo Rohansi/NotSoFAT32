@@ -114,7 +114,7 @@ void Fat32Disk::format(const std::string &volumeLabel, size_t sectorsPerCluster)
     for (size_t i = 0; i < m_bpb.fatSize; i++)
     {
         if (i == 0)
-            fatBuffer[0] = 0;
+            fatBuffer[0] = FatEof;
 
         m_disk->writeSector(m_bpb.reservedSectors + i, fatBuffer.get());
 
