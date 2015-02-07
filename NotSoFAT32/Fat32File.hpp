@@ -14,7 +14,7 @@ class Fat32File
 
 public:
 
-    Fat32File(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<DirectoryEntry> entry); // internal
+    Fat32File(std::weak_ptr<Fat32Disk> fat32, std::shared_ptr<DirectoryEntry> entry); // internal
     Fat32File(Fat32File &&other);
     ~Fat32File();
 
@@ -31,7 +31,7 @@ public:
 
 private:
 
-    std::shared_ptr<Fat32Disk> m_fat32;
+    std::weak_ptr<Fat32Disk> m_fat32;
 
     std::shared_ptr<DirectoryEntry> m_entry;
     bool m_entryDirty;

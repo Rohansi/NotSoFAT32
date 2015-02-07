@@ -5,7 +5,7 @@
 #include "Fat32Disk.hpp"
 #include "Interface/IFat32Directory.hpp"
 
-Fat32Root::Fat32Root(std::shared_ptr<Fat32Disk> fat32)
+Fat32Root::Fat32Root(std::weak_ptr<Fat32Disk> fat32)
     : IFat32Directory(fat32)
 {
     m_fat32 = fat32;
@@ -19,8 +19,12 @@ Fat32Root::Fat32Root(Fat32Root &&other)
 
 void Fat32Root::initialize()
 {
+    auto &fat32Disk = m_fat32.lock();
+    if (!fat32Disk)
+        throw std::exception(FatDiskFreedError);
+
     Fat32DirectoryEntry dirEntry = {};
-    dirEntry.firstCluster = m_fat32->m_bpb.rootCluster;
+    dirEntry.firstCluster = fat32Disk->m_bpb.rootCluster;
     dirEntry.size = std::numeric_limits<int>::max();
 
     m_entry = std::shared_ptr<DirectoryEntry>(new DirectoryEntry(m_fat32, shared_from_this(), -1, dirEntry));

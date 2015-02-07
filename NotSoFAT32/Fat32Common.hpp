@@ -3,26 +3,23 @@
 
 #include <cstdint>
 
-typedef uint32_t fatcluster_t;
-
 const size_t FatNameLength = 23;
 
-const fatcluster_t FatEof = 0xFFFFFFFC;
-const fatcluster_t FatBad = 0xFFFFFFFD;
-const fatcluster_t FatUnassign = 0xFFFFFFFE;
-const fatcluster_t FatFree = 0xFFFFFFFF;
+typedef uint32_t FatCluster;
 
-namespace FatAttrib
+const FatCluster FatEof         = 0xFFFFFFFC;
+const FatCluster FatBad         = 0xFFFFFFFD;
+const FatCluster FatUnassign    = 0xFFFFFFFE;
+const FatCluster FatFree        = 0xFFFFFFFF;
+
+enum class FatAttrib
 {
-    enum
-    {
-        File = 0x00,
-        ReadOnly = 0x01,
-        Hidden = 0x02,
-        System = 0x04,
-        Directory = 0x08
-    };
-}
+    File = 0x00,
+    ReadOnly = 0x01,
+    Hidden = 0x02,
+    System = 0x04,
+    Directory = 0x08
+};
 
 #pragma pack(push,1)
 

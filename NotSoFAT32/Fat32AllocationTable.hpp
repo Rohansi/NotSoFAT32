@@ -14,10 +14,10 @@ public:
     Fat32AllocationTable(Fat32Disk* fat32);
     ~Fat32AllocationTable();
 
-    fatcluster_t read(fatcluster_t index);
-    void write(fatcluster_t index, fatcluster_t value);
-    fatcluster_t alloc();
-    void free(fatcluster_t index);
+    FatCluster read(FatCluster index);
+    void write(FatCluster index, FatCluster value);
+    FatCluster alloc();
+    void free(FatCluster index);
     void reset();
 
 private:
@@ -26,13 +26,13 @@ private:
 
     bool m_cacheDirty;
     size_t m_cachedSector;
-    std::unique_ptr<fatcluster_t[]> m_cache;
+    std::unique_ptr<FatCluster[]> m_cache;
     size_t m_entryCount;
 
-    fatcluster_t findFree(fatcluster_t startCluster);
+    FatCluster findFree(FatCluster startCluster);
     void flush();
-    size_t getFatSector(fatcluster_t index);
-    size_t getFatSectorOffset(fatcluster_t index);
+    size_t getFatSector(FatCluster index);
+    size_t getFatSectorOffset(FatCluster index);
 };
 
 #endif

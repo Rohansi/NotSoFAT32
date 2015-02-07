@@ -5,6 +5,8 @@
 #include "Fat32AllocationTable.hpp"
 #include "Fat32Common.hpp"
 
+const char *FatDiskFreedError = "Fat32Disk instance was freed";
+
 Fat32Disk::Fat32Disk(std::shared_ptr<Disk> disk)
     : m_disk(disk), m_fat(this)
 {
@@ -28,7 +30,7 @@ size_t Fat32Disk::getClusterCount() const
     return m_bpb.totalSectors / m_bpb.sectorsPerCluster;
 }
 
-void Fat32Disk::readCluster(fatcluster_t cluster, char *buffer)
+void Fat32Disk::readCluster(FatCluster cluster, char *buffer)
 {
     if (cluster < 0 || cluster >= getClusterCount())
         throw std::exception("Cluster out of range");
@@ -43,7 +45,7 @@ void Fat32Disk::readCluster(fatcluster_t cluster, char *buffer)
     }
 }
 
-void Fat32Disk::writeCluster(fatcluster_t cluster, char *buffer)
+void Fat32Disk::writeCluster(FatCluster cluster, char *buffer)
 {
     if (cluster < 0 || cluster >= getClusterCount())
         throw std::exception("Cluster out of range");
@@ -93,7 +95,7 @@ void Fat32Disk::format(const std::string &volumeLabel, size_t sectorsPerCluster)
     m_bpb.sectorsPerCluster = sectorsPerCluster;
 
     auto totalClusters = m_bpb.totalSectors / m_bpb.sectorsPerCluster;
-    m_bpb.fatSize = (totalClusters * sizeof(fatcluster_t)) / m_bpb.bytesPerSector; // TODO: fatSize is too large with this method as it includes the fat in the calculation
+    m_bpb.fatSize = (totalClusters * sizeof(FatCluster)) / m_bpb.bytesPerSector; // TODO: fatSize is too large with this method as it includes the fat in the calculation
 
     m_bpb.rootCluster = 0;
 
@@ -103,8 +105,8 @@ void Fat32Disk::format(const std::string &volumeLabel, size_t sectorsPerCluster)
     std::memcpy(buffer.get(), &m_bpb, sizeof(Fat32Bpb));
     m_disk->writeSector(0, buffer.get());
 
-    auto fatEntriesPerSector = m_bpb.bytesPerSector / sizeof(fatcluster_t);
-    auto fatBuffer = std::make_unique<fatcluster_t[]>(fatEntriesPerSector);
+    auto fatEntriesPerSector = m_bpb.bytesPerSector / sizeof(FatCluster);
+    auto fatBuffer = std::make_unique<FatCluster[]>(fatEntriesPerSector);
 
     for (size_t i = 0; i < fatEntriesPerSector; i++)
         fatBuffer[i] = FatFree;

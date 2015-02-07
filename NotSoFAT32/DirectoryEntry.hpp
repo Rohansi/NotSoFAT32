@@ -21,12 +21,12 @@ public:
 
 private:
 
-    DirectoryEntry(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<IFat32Directory> parent, int parentPosition, Fat32DirectoryEntry entry);
+    DirectoryEntry(std::weak_ptr<Fat32Disk> fat32, std::weak_ptr<IFat32Directory> parent, int parentPosition, Fat32DirectoryEntry entry);
 
     void save() const;
 
-    std::shared_ptr<Fat32Disk> m_fat32;
-    std::shared_ptr<IFat32Directory> m_parent;
+    std::weak_ptr<Fat32Disk> m_fat32;
+    std::weak_ptr<IFat32Directory> m_parent;
     int m_parentPosition;
     Fat32DirectoryEntry m_entry;
     std::string m_name;

@@ -1,7 +1,7 @@
 #include "DirectoryEntry.hpp"
 #include "Interface/IFat32Directory.hpp"
 
-DirectoryEntry::DirectoryEntry(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<IFat32Directory> parent, int parentPosition, Fat32DirectoryEntry entry)
+DirectoryEntry::DirectoryEntry(std::weak_ptr<Fat32Disk> fat32, std::weak_ptr<IFat32Directory> parent, int parentPosition, Fat32DirectoryEntry entry)
 {
     m_fat32 = fat32;
     m_parent = parent;
@@ -27,5 +27,9 @@ size_t DirectoryEntry::getSize() const
 
 void DirectoryEntry::save() const
 {
-    m_parent->update(*this);
+    auto &parent = m_parent.lock();
+    if (!parent)
+        throw std::exception(FatDirectoryFreedError);
+
+    parent->update(*this);
 }

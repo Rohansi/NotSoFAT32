@@ -12,7 +12,7 @@ class Fat32Root : public IFat32Directory
 
 public:
 
-    Fat32Root(std::shared_ptr<Fat32Disk> fat32);
+    Fat32Root(std::weak_ptr<Fat32Disk> fat32);
     Fat32Root(Fat32Root &&other);
 
 protected:
@@ -21,9 +21,9 @@ protected:
 
 private:
 
-    std::shared_ptr<Fat32Disk> m_fat32;
+    std::weak_ptr<Fat32Disk> m_fat32;
 
-    std::shared_ptr<DirectoryEntry> getRootEntry(std::shared_ptr<Fat32Disk> fat32);
+    std::shared_ptr<DirectoryEntry> getRootEntry(std::weak_ptr<Fat32Disk> fat32);
 
 };
 

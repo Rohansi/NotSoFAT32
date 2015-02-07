@@ -4,7 +4,7 @@
 #include "Fat32Disk.hpp"
 #include "Fat32AllocationTable.hpp"
 
-Fat32File::Fat32File(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<DirectoryEntry> entry)
+Fat32File::Fat32File(std::weak_ptr<Fat32Disk> fat32, std::shared_ptr<DirectoryEntry> entry)
     : m_fat32(fat32), m_entry(entry)
 {
     m_entryDirty = false;
@@ -15,7 +15,11 @@ Fat32File::Fat32File(std::shared_ptr<Fat32Disk> fat32, std::shared_ptr<Directory
         m_size = entry->getSize();
     }
 
-    m_clusterSize = fat32->getClusterSize();
+    auto &fat32Disk = m_fat32.lock();
+    if (!fat32Disk)
+        throw std::exception(FatDiskFreedError);
+
+    m_clusterSize = fat32Disk->getClusterSize();
     m_originalSize = m_size;
 
     m_buffer = std::make_unique<char[]>(m_clusterSize);
@@ -62,7 +66,11 @@ void Fat32File::flush()
 {
     if (m_clusterDirty)
     {
-        m_fat32->writeCluster(m_cluster, m_buffer.get());
+        auto &fat32Disk = m_fat32.lock();
+        if (!fat32Disk)
+            throw std::exception(FatDiskFreedError);
+
+        fat32Disk->writeCluster(m_cluster, m_buffer.get());
         m_clusterDirty = false;
     }
 
@@ -188,7 +196,11 @@ bool Fat32File::checkSeekToPosition(bool alloc)
         m_clusterOffset = m_position % m_clusterSize;
     }
 
-    m_fat32->readCluster(m_cluster, m_buffer.get());
+    auto &fat32Disk = m_fat32.lock();
+    if (!fat32Disk)
+        throw std::exception(FatDiskFreedError);
+
+    fat32Disk->readCluster(m_cluster, m_buffer.get());
 
     return true;
 }
@@ -197,6 +209,10 @@ bool Fat32File::checkSeekToPosition(bool alloc)
 // returns false if eof && !alloc
 bool Fat32File::checkNextCluster(bool alloc, bool read)
 {
+    auto &fat32Disk = m_fat32.lock();
+    if (!fat32Disk)
+        throw std::exception(FatDiskFreedError);
+
     if (m_clusterOffset < m_clusterSize)
         return true;
 
@@ -210,7 +226,7 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
     if (m_cluster >= FatEof)
         m_cluster = m_firstCluster;
     else
-        m_cluster = m_fat32->m_fat.read(m_cluster);
+        m_cluster = fat32Disk->m_fat.read(m_cluster);
 
     if (m_cluster == FatBad)
         throw std::exception("Bad cluster in chain");
@@ -226,7 +242,7 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
         if (!alloc)
             return false;
             
-        auto &fat = m_fat32->m_fat;
+        auto &fat = fat32Disk->m_fat;
         auto nextCluster = fat.alloc();
         fat.write(currentCluster, nextCluster);
         fat.write(nextCluster, FatEof);
@@ -238,7 +254,7 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
     m_clusterOffset = 0;
 
     if (read)
-        m_fat32->readCluster(m_cluster, m_buffer.get());
+        fat32Disk->readCluster(m_cluster, m_buffer.get());
 
     return true;
 }
@@ -256,8 +272,12 @@ bool Fat32File::checkHasCluster(bool alloc)
     if (!m_entry)
         throw std::exception("Tried to allocate on an empty entry-less file");
 
-    m_firstCluster = m_fat32->m_fat.alloc();
-    m_fat32->m_fat.write(m_firstCluster, FatEof);
+    auto &fat32Disk = m_fat32.lock();
+    if (!fat32Disk)
+        throw std::exception(FatDiskFreedError);
+
+    m_firstCluster = fat32Disk->m_fat.alloc();
+    fat32Disk->m_fat.write(m_firstCluster, FatEof);
 
     m_entryDirty = true;
 

@@ -5,6 +5,8 @@
 
 int main(int argc, char *argv[])
 {
+    std::shared_ptr<Fat32Root> root;
+
     try
     {
         auto disk = Disk::create("disk.img", 10000);
@@ -15,16 +17,18 @@ int main(int argc, char *argv[])
         auto fat32Disk = std::make_shared<Fat32Disk>(disk);*/
 
         const std::string fileName = "test.txt";
-        const std::string hello = "hello world!!\r\n";
+        const std::string hello = "hello world!! ";
 
         auto dir = fat32Disk->root();
         dir->add(fileName, FatAttrib::File);
         dir->add("testfolder", FatAttrib::Directory);
 
+        root = dir;
+
         {
             auto file = dir->file(fileName);
 
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < 50; i++)
                 file.write(hello.c_str(), hello.length());
 
             file.seek(0);
@@ -48,7 +52,7 @@ int main(int argc, char *argv[])
         {
             std::cout << e->getName();
 
-            if (!(e->getAttributes() & FatAttrib::Directory))
+            if (!(e->getAttributes() & (char)FatAttrib::Directory))
                 std::cout << " - " << e->getSize() << " bytes";
 
             std::cout << std::endl;

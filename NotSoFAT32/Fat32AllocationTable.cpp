@@ -8,8 +8,8 @@ Fat32AllocationTable::Fat32AllocationTable(Fat32Disk *fat32)
     m_cacheDirty = false;
     m_cachedSector = -1;
 
-    auto entriesPerSector = fat32->getDisk()->getSectorSize() / sizeof(fatcluster_t);
-    m_cache = std::make_unique<fatcluster_t[]>(entriesPerSector);
+    auto entriesPerSector = fat32->getDisk()->getSectorSize() / sizeof(FatCluster);
+    m_cache = std::make_unique<FatCluster[]>(entriesPerSector);
     m_entryCount = m_fat32->m_bpb.fatSize * entriesPerSector;
 }
 
@@ -18,7 +18,7 @@ Fat32AllocationTable::~Fat32AllocationTable()
     flush();
 }
 
-fatcluster_t Fat32AllocationTable::read(fatcluster_t index)
+FatCluster Fat32AllocationTable::read(FatCluster index)
 {
     if (index >= m_entryCount)
         throw std::exception("FAT index out of range");
@@ -37,7 +37,7 @@ fatcluster_t Fat32AllocationTable::read(fatcluster_t index)
     return m_cache[offset];
 }
 
-void Fat32AllocationTable::write(fatcluster_t index, fatcluster_t value)
+void Fat32AllocationTable::write(FatCluster index, FatCluster value)
 {
     if (index >= m_entryCount)
         throw std::exception("FAT index out of range");
@@ -57,14 +57,14 @@ void Fat32AllocationTable::write(fatcluster_t index, fatcluster_t value)
     m_cacheDirty = true;
 }
 
-fatcluster_t Fat32AllocationTable::alloc()
+FatCluster Fat32AllocationTable::alloc()
 {
     auto index = findFree(0);
     write(index, FatUnassign);
     return index;
 }
 
-void Fat32AllocationTable::free(fatcluster_t index)
+void Fat32AllocationTable::free(FatCluster index)
 {
     write(index, FatFree);
 }
@@ -75,7 +75,7 @@ void Fat32AllocationTable::reset()
     m_cachedSector = FatFree;
 }
 
-fatcluster_t Fat32AllocationTable::findFree(fatcluster_t startCluster)
+FatCluster Fat32AllocationTable::findFree(FatCluster startCluster)
 {
     auto lastCluster = m_fat32->getClusterCount();
     auto cluster = startCluster;
@@ -102,13 +102,13 @@ void Fat32AllocationTable::flush()
     m_cacheDirty = false;
 }
 
-size_t Fat32AllocationTable::getFatSector(fatcluster_t index)
+size_t Fat32AllocationTable::getFatSector(FatCluster index)
 {
     auto fatOffset = m_fat32->m_bpb.reservedSectors;
-    return fatOffset + (index / (m_fat32->m_bpb.bytesPerSector / sizeof(fatcluster_t)));
+    return fatOffset + (index / (m_fat32->m_bpb.bytesPerSector / sizeof(FatCluster)));
 }
 
-size_t Fat32AllocationTable::getFatSectorOffset(fatcluster_t index)
+size_t Fat32AllocationTable::getFatSectorOffset(FatCluster index)
 {
-    return index % (m_fat32->m_bpb.bytesPerSector / sizeof(fatcluster_t));
+    return index % (m_fat32->m_bpb.bytesPerSector / sizeof(FatCluster));
 }

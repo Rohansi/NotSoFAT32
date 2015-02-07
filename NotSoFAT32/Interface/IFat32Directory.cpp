@@ -5,7 +5,9 @@
 #include "../Fat32File.hpp"
 #include "../Fat32Disk.hpp"
 
-IFat32Directory::IFat32Directory(std::shared_ptr<Fat32Disk> fat32)
+const char *FatDirectoryFreedError = "IFat32Directory instance was freed";
+
+IFat32Directory::IFat32Directory(std::weak_ptr<Fat32Disk> fat32)
 {
     m_fat32 = fat32;
     m_entry = std::shared_ptr<DirectoryEntry>();
@@ -70,7 +72,12 @@ std::vector<std::shared_ptr<DirectoryEntry>> IFat32Directory::entries()
 std::shared_ptr<IFat32Directory> IFat32Directory::up()
 {
     checkInitialized();
-    return m_entry->m_parent;
+
+    auto &parent = m_entry->m_parent.lock();
+    if (!parent)
+        throw std::exception(FatDirectoryFreedError);
+
+    return parent;
 }
 
 std::shared_ptr<IFat32Directory> IFat32Directory::directory(const std::string &name)
@@ -81,12 +88,12 @@ std::shared_ptr<IFat32Directory> IFat32Directory::directory(const std::string &n
     if (item == m_entries.end())
         throw std::exception("Entry doesn't exist");
 
-    if ((item->second->getAttributes() & FatAttrib::Directory) == 0)
+    if ((item->second->getAttributes() & (char)FatAttrib::Directory) == 0)
         throw std::exception("Not a directory");
 
     int firstCluster = item->second->m_entry.firstCluster;
 
-    return m_fat32->getOrAddDirectory(firstCluster, [&]() { return Fat32Directory(m_fat32, item->second); });
+    return m_fat32.lock()->getOrAddDirectory(firstCluster, [&]() { return Fat32Directory(m_fat32, item->second); });
 }
 
 Fat32File IFat32Directory::file(const std::string &name)
@@ -97,13 +104,13 @@ Fat32File IFat32Directory::file(const std::string &name)
     if (item == m_entries.end())
         throw std::exception("Entry doesn't exist");
 
-    if ((item->second->getAttributes() & FatAttrib::Directory) != 0)
+    if ((item->second->getAttributes() & (char)FatAttrib::Directory) != 0)
         throw std::exception("Not a file");
 
     return Fat32File(m_fat32, item->second);
 }
 
-bool IFat32Directory::add(const std::string &name, char attributes)
+bool IFat32Directory::add(const std::string &name, FatAttrib attributes)
 {
     checkInitialized();
 
@@ -135,7 +142,7 @@ bool IFat32Directory::add(const std::string &name, char attributes)
     // write new entry
     entry = {};
     std::copy(name.begin(), name.end(), entry.name);
-    entry.attrib = attributes;
+    entry.attrib = (char)attributes;
     entry.size = 0;
     entry.firstCluster = FatEof;
 
@@ -159,7 +166,7 @@ bool IFat32Directory::remove(const std::string &name)
 
     auto &entry = item->second;
 
-    if (entry->getAttributes() & FatAttrib::Directory)
+    if (entry->getAttributes() & (char)FatAttrib::Directory)
     {
         // need to recursively remove
         auto dir = directory(name);
@@ -171,7 +178,7 @@ bool IFat32Directory::remove(const std::string &name)
     }
     
     // need to free clusters
-    auto &fat = m_fat32->m_fat;
+    auto &fat = m_fat32.lock()->m_fat;
     int cluster = entry->m_entry.firstCluster;
 
     while (cluster < FatEof)

@@ -10,6 +10,8 @@
 #include "Fat32Root.hpp"
 #include "DirectoryEntry.hpp"
 
+extern const char *FatDiskFreedError;
+
 class DirectoryEntry;
 class Fat32File;
 class Disk;
@@ -29,8 +31,8 @@ public:
 
     size_t getClusterSize() const;
     size_t getClusterCount() const;
-    void readCluster(fatcluster_t cluster, char *buffer);
-    void writeCluster(fatcluster_t cluster, char *buffer);
+    void readCluster(FatCluster cluster, char *buffer);
+    void writeCluster(FatCluster cluster, char *buffer);
 
     std::shared_ptr<Fat32Root> root();
 
