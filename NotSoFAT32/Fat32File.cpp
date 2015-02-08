@@ -58,7 +58,61 @@ Fat32File::~Fat32File()
 
     if (m_size < m_originalSize)
     {
-        // TODO: free clusters that we dont need
+        auto &fat32Disk = m_fat32.lock();
+        if (!fat32Disk)
+            throw std::exception(FatDiskFreedError);
+
+        auto clusterSize = fat32Disk->getClusterSize();
+
+        // original size in clusters
+        auto originalSizeClusters = (m_originalSize + clusterSize - 1) / clusterSize;
+
+        // current size in clusters
+        auto sizeClusters = (m_size + clusterSize - 1) / clusterSize;
+
+        if (sizeClusters >= originalSizeClusters)
+            return;
+
+        seek(sizeClusters * clusterSize);
+
+        if (!checkSeekToPosition(false))
+            throw std::exception("Failed to shrink file (seek 1)");
+
+        auto &fat = fat32Disk->m_fat;
+
+        if (sizeClusters == 0)
+        {
+            m_firstCluster = FatEof;
+            m_entryDirty = true;
+
+            flush();
+        }
+        else
+        {
+            auto temp = m_cluster;
+
+            // find the new last cluster
+            seek((sizeClusters * clusterSize) - 1);
+
+            if (!checkSeekToPosition(false))
+                throw std::exception("Failed to shrink file (seek 2)");
+
+            // mark it as eof
+            fat.write(m_cluster, FatEof);
+
+            m_cluster = temp;
+        }
+
+        // free excess clusters
+        auto next = fat.read(m_cluster);
+        fat.free(m_cluster);
+
+        while (next <= FatEof)
+        {
+            auto cur = next;
+            next = fat.read(cur);
+            fat.free(cur);
+        }
     }
 }
 
@@ -145,11 +199,28 @@ bool Fat32File::eof() const
     return m_position >= m_size;
 }
 
-void Fat32File::truncate()
+void Fat32File::truncate(size_t length)
 {
+    if (length == m_size)
+        return;
+
     flush();
-    m_size = 0;
-    seek(0);
+
+    auto oldSize = m_size;
+
+    m_size = length;
+    m_entryDirty = true;
+
+    if (length <= oldSize)
+        return; // shrinking is done in destructor
+
+    // extend file
+    auto originalPosition = tell();
+
+    seek(length - 1);
+    checkSeekToPosition(true); // allocates all the clusters
+
+    seek(originalPosition);
 }
 
 // switches to the cluster at m_position if needed
@@ -247,6 +318,8 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
         fat.write(currentCluster, nextCluster);
         fat.write(nextCluster, FatEof);
 
+        fat32Disk->zeroCluster(nextCluster);
+
         m_cluster = nextCluster;
     }
 
@@ -278,6 +351,8 @@ bool Fat32File::checkHasCluster(bool alloc)
 
     m_firstCluster = fat32Disk->m_fat.alloc();
     fat32Disk->m_fat.write(m_firstCluster, FatEof);
+
+    fat32Disk->zeroCluster(m_firstCluster);
 
     m_entryDirty = true;
 

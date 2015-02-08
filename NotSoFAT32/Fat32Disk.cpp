@@ -13,6 +13,15 @@ Fat32Disk::Fat32Disk(std::shared_ptr<Disk> disk)
     auto buffer = std::make_unique<char[]>(m_disk->getSectorSize());
     m_disk->readSector(0, buffer.get());
     m_bpb = *(Fat32Bpb*)buffer.get();
+
+    // TODO: make sure its NSFAT32, need to move format somewhere else though
+
+    m_zeroCluster = std::make_unique<char[]>(getClusterSize());
+
+    for (size_t i = 0; i < getClusterSize(); i++)
+    {
+        m_zeroCluster[i] = 0;
+    }
 }
 
 std::shared_ptr<Disk> Fat32Disk::getDisk() const
@@ -58,6 +67,11 @@ void Fat32Disk::writeCluster(FatCluster cluster, char *buffer)
         m_disk->writeSector(sector++, buffer);
         buffer += m_bpb.bytesPerSector;
     }
+}
+
+void Fat32Disk::zeroCluster(FatCluster cluster)
+{
+    writeCluster(cluster, m_zeroCluster.get());
 }
 
 std::shared_ptr<Fat32Root> Fat32Disk::root()

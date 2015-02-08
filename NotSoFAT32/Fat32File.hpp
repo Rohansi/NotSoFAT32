@@ -27,7 +27,7 @@ public:
 
     bool eof() const;
 
-    void truncate();
+    void truncate(size_t length = 0);
 
 private:
 

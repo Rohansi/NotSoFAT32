@@ -213,7 +213,7 @@ void IFat32Directory::update(const DirectoryEntry &entry)
     file.write((char*)&entry.m_entry, sizeof(Fat32DirectoryEntry));
 }
 
-static const std::string illegalChars =
+const char illegalChars[] =
 {
     '"', '*', '/', ':', '<', '>', '?', '\\',
     '|', 127, '+', ',', ';', '=', '[', ']'

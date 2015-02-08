@@ -33,6 +33,7 @@ public:
     size_t getClusterCount() const;
     void readCluster(FatCluster cluster, char *buffer);
     void writeCluster(FatCluster cluster, char *buffer);
+    void zeroCluster(FatCluster cluster);
 
     std::shared_ptr<Fat32Root> root();
 
@@ -44,6 +45,8 @@ private:
     Fat32Bpb m_bpb;
     Fat32AllocationTable m_fat;
     std::shared_ptr<Fat32Root> m_root;
+
+    std::unique_ptr<char[]> m_zeroCluster;
 
     std::unordered_map<size_t, std::weak_ptr<IFat32Directory>> m_directories;
     std::shared_ptr<IFat32Directory> getOrAddDirectory(size_t firstCluster, std::function<IFat32Directory()> ctor);
