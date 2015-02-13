@@ -29,20 +29,17 @@ struct Fat32Bpb
     char        fsysName[7];            // Must be "NSFAT32"
     uint8_t     fsysVersion;            // Filesystem version, currently 0
 
-    uint8_t     driveNumber;            // Drive device id
     uint16_t    bytesPerSector;         // Bytes per sector
-    uint16_t    numOfHeads;             // Number of heads
-    uint16_t    sectorsPerTrack;        // Sectors per track
     uint32_t    totalSectors;           // Sector count
-    uint16_t    reservedSectors;        // Reserved sectors
 
+    uint16_t    reservedSectors;        // Reserved sectors
     uint8_t     sectorsPerCluster;      // Sectors per cluster
     uint32_t    fatSize;                // Size of the FAT, in sectors
     FatCluster  rootCluster;            // Offset of root directory
     char        label[16];              // Volume label
 
-    uint8_t		code[456];              // Boot code
-    uint16_t    bootSig;                // Boot signature, should be 0xAA55
+    uint8_t	    code[461];              // Boot code
+    uint16_t    bootSig;                // Boot signature, should be 0xAA55 if bootable
 };
 
 struct Fat32DirectoryEntry
