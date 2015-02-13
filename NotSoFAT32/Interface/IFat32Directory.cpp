@@ -86,10 +86,10 @@ std::shared_ptr<IFat32Directory> IFat32Directory::directory(const std::string &n
 
     auto item = m_entries.find(name);
     if (item == m_entries.end())
-        throw std::exception("Entry doesn't exist");
+        throw std::exception("entry doesn't exist");
 
     if ((item->second->getAttributes() & (char)FatAttrib::Directory) == 0)
-        throw std::exception("Not a directory");
+        throw std::exception("not a directory");
 
     auto firstCluster = item->second->m_entry.firstCluster;
 
@@ -102,10 +102,10 @@ Fat32File IFat32Directory::file(const std::string &name)
 
     auto item = m_entries.find(name);
     if (item == m_entries.end())
-        throw std::exception("Entry doesn't exist");
+        throw std::exception("entry doesn't exist");
 
     if ((item->second->getAttributes() & (char)FatAttrib::Directory) != 0)
-        throw std::exception("Not a file");
+        throw std::exception("not a file");
 
     return Fat32File(m_fat32, item->second);
 }

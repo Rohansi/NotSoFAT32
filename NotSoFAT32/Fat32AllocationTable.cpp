@@ -83,7 +83,7 @@ FatCluster Fat32AllocationTable::findFree(FatCluster startCluster)
     while (true)
     {
         if (cluster >= lastCluster)
-            throw std::exception("No free clusters");
+            throw std::exception("disk is full");
 
         auto value = read(cluster);
         if (value == FatFree)

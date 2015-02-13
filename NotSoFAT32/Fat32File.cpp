@@ -78,7 +78,7 @@ Fat32File::~Fat32File()
         seek(sizeClusters * clusterSize);
 
         if (!checkSeekToPosition(false))
-            throw std::exception("Failed to shrink file (seek 1)");
+            throw std::exception("failed to shrink file (seek 1)");
 
         auto &fat = fat32Disk->m_fat;
 
@@ -97,7 +97,7 @@ Fat32File::~Fat32File()
             seek((sizeClusters * clusterSize) - 1);
 
             if (!checkSeekToPosition(false))
-                throw std::exception("Failed to shrink file (seek 2)");
+                throw std::exception("failed to shrink file (seek 2)");
 
             // mark it as eof
             fat.write(m_cluster, FatEof);
@@ -142,7 +142,7 @@ void Fat32File::flush()
 void Fat32File::seek(size_t position)
 {
     if (position < 0)
-        throw std::exception("Seek to negative");
+        throw std::exception("can't seek to negative position");
 
     m_position = position;
 }
@@ -294,7 +294,7 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
     auto currentCluster = m_cluster;
 
     if (m_firstCluster >= FatEof)
-        throw std::exception("First cluster is invalid in checkNextCluster");
+        throw std::exception("first cluster is invalid in checkNextCluster");
 
     if (m_cluster >= FatEof)
         m_cluster = m_firstCluster;
@@ -302,13 +302,13 @@ bool Fat32File::checkNextCluster(bool alloc, bool read)
         m_cluster = fat32Disk->m_fat.read(m_cluster);
 
     if (m_cluster == FatBad)
-        throw std::exception("Bad cluster in chain");
+        throw std::exception("bad cluster in chain");
 
     if (m_cluster == FatUnassign)
-        throw std::exception("Unassigned cluster in chain");
+        throw std::exception("unassigned cluster in chain");
 
     if (m_cluster == FatFree)
-        throw std::exception("Free cluster in chain");
+        throw std::exception("free cluster in chain");
 
     if (m_cluster == FatEof)
     {
@@ -345,7 +345,7 @@ bool Fat32File::checkHasCluster(bool alloc)
         return false;
 
     if (!m_entry)
-        throw std::exception("Tried to allocate on an empty entry-less file");
+        throw std::exception("tried to allocate on an empty entry-less file");
 
     auto &fat32Disk = m_fat32.lock();
     if (!fat32Disk)
