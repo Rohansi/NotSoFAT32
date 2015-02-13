@@ -13,17 +13,17 @@ class Fat32Directory : public IFat32Directory
 
 public:
 
-    Fat32Directory(std::weak_ptr<Fat32Disk> fat32, std::shared_ptr<DirectoryEntry> entry); // internal
-    Fat32Directory(Fat32Directory &&other);
+	Fat32Directory(std::weak_ptr<Fat32Disk> fat32, std::shared_ptr<DirectoryEntry> entry); // internal
+	Fat32Directory(Fat32Directory &&other);
 
 protected:
-    
-    virtual void initialize();
+
+	virtual void initialize();
 
 private:
 
-    std::weak_ptr<Fat32Disk> m_fat32;
-    std::shared_ptr<DirectoryEntry> m_entry;
+	std::weak_ptr<Fat32Disk> m_fat32;
+	std::shared_ptr<DirectoryEntry> m_entry;
 
 };
 

@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30324.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22512.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NotSoFAT32", "NotSoFAT32\NotSoFAT32.vcxproj", "{A2FF985C-D5BD-4924-9A4C-8DDF40875706}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mknsfat32fs", "mknsfat32fs\mknsfat32fs.vcxproj", "{D795C748-C2E3-4BE7-924A-9732ADB4930E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A2FF985C-D5BD-4924-9A4C-8DDF40875706} = {A2FF985C-D5BD-4924-9A4C-8DDF40875706}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{A2FF985C-D5BD-4924-9A4C-8DDF40875706}.Debug|Win32.Build.0 = Debug|Win32
 		{A2FF985C-D5BD-4924-9A4C-8DDF40875706}.Release|Win32.ActiveCfg = Release|Win32
 		{A2FF985C-D5BD-4924-9A4C-8DDF40875706}.Release|Win32.Build.0 = Release|Win32
+		{D795C748-C2E3-4BE7-924A-9732ADB4930E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D795C748-C2E3-4BE7-924A-9732ADB4930E}.Debug|Win32.Build.0 = Debug|Win32
+		{D795C748-C2E3-4BE7-924A-9732ADB4930E}.Release|Win32.ActiveCfg = Release|Win32
+		{D795C748-C2E3-4BE7-924A-9732ADB4930E}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
