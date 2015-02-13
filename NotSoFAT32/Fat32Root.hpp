@@ -12,16 +12,16 @@ class Fat32Root : public IFat32Directory
 
 public:
 
-	Fat32Root(std::weak_ptr<Fat32Disk> fat32);
-	Fat32Root(Fat32Root &&other);
+    Fat32Root(std::weak_ptr<Fat32Disk> fat32);
+    Fat32Root(Fat32Root &&other);
 
 protected:
 
-	virtual void initialize();
+    virtual void initialize();
 
 private:
 
-	std::weak_ptr<Fat32Disk> m_fat32;
+    std::weak_ptr<Fat32Disk> m_fat32;
 
 };
 

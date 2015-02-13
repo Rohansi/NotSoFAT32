@@ -16,38 +16,38 @@ class Fat32File;
 
 class IFat32Directory : public std::enable_shared_from_this<IFat32Directory>
 {
-	friend class DirectoryEntry;
+    friend class DirectoryEntry;
 
 public:
 
-	IFat32Directory(std::weak_ptr<Fat32Disk> fat32);
-	IFat32Directory(IFat32Directory &&other);
+    IFat32Directory(std::weak_ptr<Fat32Disk> fat32);
+    IFat32Directory(IFat32Directory &&other);
 
-	std::vector<std::shared_ptr<DirectoryEntry>> entries();
+    std::vector<std::shared_ptr<DirectoryEntry>> entries();
 
-	std::shared_ptr<IFat32Directory> up();
-	std::shared_ptr<IFat32Directory> directory(const std::string &name);
-	Fat32File file(const std::string &name);
+    std::shared_ptr<IFat32Directory> up();
+    std::shared_ptr<IFat32Directory> directory(const std::string &name);
+    Fat32File file(const std::string &name);
 
-	bool add(const std::string &name, FatAttrib attributes);
-	bool remove(const std::string &name);
-	bool exists(const std::string &name);
+    bool add(const std::string &name, FatAttrib attributes);
+    bool remove(const std::string &name);
+    bool exists(const std::string &name);
 
-	static bool isValidName(const std::string &name);
+    static bool isValidName(const std::string &name);
 
 protected:
 
-	std::shared_ptr<DirectoryEntry> m_entry;
+    std::shared_ptr<DirectoryEntry> m_entry;
 
-	virtual void initialize();
+    virtual void initialize();
 
 private:
 
-	std::weak_ptr<Fat32Disk> m_fat32;
-	std::unordered_map<std::string, std::shared_ptr<DirectoryEntry>> m_entries;
+    std::weak_ptr<Fat32Disk> m_fat32;
+    std::unordered_map<std::string, std::shared_ptr<DirectoryEntry>> m_entries;
 
-	void checkInitialized();
-	void update(const DirectoryEntry &entry);
+    void checkInitialized();
+    void update(const DirectoryEntry &entry);
 
 };
 
