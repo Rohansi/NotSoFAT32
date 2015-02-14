@@ -50,6 +50,8 @@ private:
 
     std::unordered_map<size_t, std::weak_ptr<IFat32Directory>> m_directories;
 
+    Fat32Disk *loadBpbBeforeFat();
+
     template<typename T>
     std::shared_ptr<IFat32Directory> Fat32Disk::getOrAddDirectory(FatCluster firstCluster, std::function<T()> ctor)
     {

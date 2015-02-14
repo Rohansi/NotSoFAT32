@@ -8,11 +8,8 @@
 const char *FatDiskFreedError = "Fat32Disk instance was freed";
 
 Fat32Disk::Fat32Disk(std::shared_ptr<Disk> disk)
-    : m_disk(disk), m_fat(this)
+    : m_disk(disk), m_fat(loadBpbBeforeFat())
 {
-    auto buffer = std::make_unique<char[]>(m_disk->getSectorSize());
-    m_disk->readSector(0, buffer.get());
-    m_bpb = *(Fat32Bpb*)buffer.get();
 
     auto name = std::string(m_bpb.fsysName, strnlen(m_bpb.fsysName, sizeof(Fat32Bpb::fsysName)));
     if (name != "NSFAT32")
@@ -20,6 +17,15 @@ Fat32Disk::Fat32Disk(std::shared_ptr<Disk> disk)
 
     m_zeroCluster = std::make_unique<char[]>(getClusterSize());
     std::memset(m_zeroCluster.get(), 0, getClusterSize());
+}
+
+Fat32Disk *Fat32Disk::loadBpbBeforeFat()
+{
+    auto buffer = std::make_unique<char[]>(m_disk->getSectorSize());
+    m_disk->readSector(0, buffer.get());
+    m_bpb = *(Fat32Bpb*)buffer.get();
+
+    return this;
 }
 
 std::shared_ptr<Disk> Fat32Disk::getDisk() const
