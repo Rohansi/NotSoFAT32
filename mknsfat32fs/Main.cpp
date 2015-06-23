@@ -129,7 +129,7 @@ int makeImage(
 
         if (bootloader != "")
         {
-            std::ifstream bootFile(bootloader);
+            std::ifstream bootFile(bootloader, std::ios::binary);
             if (!bootFile.is_open())
                 throw std::exception("failed to open bootloader");  
 
@@ -139,7 +139,7 @@ int makeImage(
             Fat32Bpb newBpb;
             bootFile.read((char*)&newBpb, sizeof(Fat32Bpb));
 
-            if (!bootFile.good())
+            if (bootFile.fail() || bootFile.gcount() != sizeof(Fat32Bpb))
                 throw std::exception("failed to read bootloader");
 
             std::memcpy(currentBpb.jump, newBpb.jump, sizeof(Fat32Bpb::jump));
